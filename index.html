@@ -196,50 +196,86 @@
   <main class="dashboard-main">
     <!-- 4 Boxes de Métriques -->
     <section class="dashboard-metrics" id="metrics-section">
-      <!-- Box 1: Revenus -->
+      <!-- Box 1: Total Revenue -->
       <div class="metric-box" data-metric="revenue">
-        <div class="metric-icon"></div>
-        <div class="metric-label">REVENUS</div>
-        <div class="metric-value">€125,430</div>
+        <div class="metric-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="metric-label">TOTAL REVENUE</div>
+        <div class="metric-value">€594,120</div>
         <div class="metric-change positive">
-          <span class="change-icon">↑</span>
+          <span class="change-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
           <span class="change-value">12.5%</span>
           <span class="change-text">vs mois dernier</span>
         </div>
       </div>
 
-      <!-- Box 2: Hashrate -->
+      <!-- Box 2: Total Hash Rate -->
       <div class="metric-box" data-metric="hashrate">
-        <div class="metric-icon"></div>
-        <div class="metric-label">HASHRATE</div>
-        <div class="metric-value">2.45 TH/s</div>
+        <div class="metric-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="metric-label">TOTAL HASH RATE</div>
+        <div class="metric-value">342.8 TH/s</div>
         <div class="metric-change positive">
-          <span class="change-icon">↑</span>
+          <span class="change-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
           <span class="change-value">8.3%</span>
           <span class="change-text">vs mois dernier</span>
         </div>
       </div>
 
-      <!-- Box 3: Actifs miniers -->
+      <!-- Box 3: Total Miners -->
       <div class="metric-box" data-metric="miners">
-        <div class="metric-icon"></div>
-        <div class="metric-label">ACTIFS MINIERS</div>
+        <div class="metric-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 9V2H18V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 18H4C3.46957 18 2.96086 17.7893 2.58579 17.4142C2.21071 17.0391 2 16.5304 2 16V11C2 10.4696 2.21071 9.96086 2.58579 9.58579C2.96086 9.21071 3.46957 9 4 9H20C20.5304 9 21.0391 9.21071 21.4142 9.58579C21.7893 9.96086 22 10.4696 22 11V16C22 16.5304 21.7893 17.0391 21.4142 17.4142C21.0391 17.7893 20.5304 18 20 18H18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 14H10V18H6V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 14H18V18H14V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="metric-label">TOTAL MINERS</div>
         <div class="metric-value">1,247</div>
         <div class="metric-change positive">
-          <span class="change-icon">↑</span>
+          <span class="change-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
           <span class="change-value">5.2%</span>
           <span class="change-text">vs mois dernier</span>
         </div>
       </div>
 
-      <!-- Box 4: Efficacité énergétique -->
-      <div class="metric-box" data-metric="efficiency">
-        <div class="metric-icon"></div>
-        <div class="metric-label">EFFICACITÉ</div>
-        <div class="metric-value">94.2%</div>
-        <div class="metric-change negative">
-          <span class="change-icon">↓</span>
-          <span class="change-value">2.1%</span>
+      <!-- Box 4: Uptime -->
+      <div class="metric-box" data-metric="uptime">
+        <div class="metric-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="metric-label">UPTIME</div>
+        <div class="metric-value">99.2%</div>
+        <div class="metric-change positive">
+          <span class="change-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="change-value">0.5%</span>
           <span class="change-text">vs mois dernier</span>
         </div>
       </div>
@@ -247,10 +283,10 @@
 
     <!-- Zone de contenu principal - Graphiques -->
     <section class="dashboard-charts" id="charts-section">
-      <!-- Graphique 1: Évolution des revenus -->
+      <!-- Graphique 1: Live Hash Rate -->
       <div class="chart-container">
         <div class="chart-header">
-          <h3 class="chart-title" id="chart-title-1">Évolution des Revenus</h3>
+          <h3 class="chart-title" id="chart-title-1">Live Hash Rate</h3>
           <div class="chart-controls">
             <button class="chart-period active" data-period="7d">7j</button>
             <button class="chart-period" data-period="30d">30j</button>
@@ -267,23 +303,47 @@
         <div class="chart-header">
           <h3 class="chart-title" id="chart-title-3">Répartition des Coûts</h3>
         </div>
-        <div class="chart-wrapper">
+        <div class="chart-wrapper chart-wrapper-costs">
           <canvas id="costs-chart"></canvas>
+          <div class="costs-legend">
+            <div class="costs-legend-item">
+              <div class="costs-legend-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" fill="#F56A3B"/>
+                  <path d="M12 6V8M12 16V18M9 9H7C6.45 9 6 9.45 6 10V14C6 14.55 6.45 15 7 15H9M17 9H15C14.45 9 14 9.45 14 10V14C14 14.55 14.45 15 15 15H17" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M10 12H14" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 10C11.45 10 11 10.45 11 11C11 11.55 11.45 12 12 12C12.55 12 13 11.55 13 11C13 10.45 12.55 10 12 10Z" fill="#FFFFFF"/>
+                </svg>
+              </div>
+              <span class="costs-legend-label">Mining</span>
+              <span class="costs-legend-value">65%</span>
+            </div>
+            <div class="costs-legend-item">
+              <div class="costs-legend-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="#000000"/>
+                  <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="#FFFFFF" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <span class="costs-legend-label">Électricité</span>
+              <span class="costs-legend-value">35%</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Section Tableaux avec Filtres -->
+    <!-- Section Operational Insights -->
     <section class="dashboard-tables" id="tables-section">
       <div class="table-container">
         <div class="table-header">
-          <h3 class="table-title" id="table-title">Liste des Données</h3>
-          <div class="table-filters">
-            <input type="text" id="search-input" class="filter-input" placeholder="Rechercher...">
-            <select id="filter-select" class="filter-select">
-              <option value="all">Tous</option>
-            </select>
-            <button class="filter-btn" id="reset-filters">Réinitialiser</button>
+          <h3 class="table-title" id="table-title">Operational Insights</h3>
+          <div class="insights-tabs">
+            <button class="insight-tab active" data-tab="deployments">Last Deployments</button>
+            <button class="insight-tab" data-tab="connections">Last Connections</button>
+            <button class="insight-tab" data-tab="onboard">Last Customer Onboard</button>
+            <button class="insight-tab" data-tab="profitability">Best Profitability Batches</button>
+            <button class="insight-tab" data-tab="newest">Newest Batches</button>
           </div>
         </div>
         <div class="table-wrapper">

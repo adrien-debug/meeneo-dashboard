@@ -253,6 +253,7 @@ html {
   z-index: 1000;
   pointer-events: none;
   display: block;
+  touch-action: auto;
 }
 
 .user-menu.active {
@@ -260,6 +261,7 @@ html {
   visibility: visible;
   transform: translateY(0);
   pointer-events: auto;
+  touch-action: auto;
 }
 
 .user-menu-header {
@@ -327,6 +329,9 @@ html {
   font-size: 14px;
   transition: background-color 0.2s ease;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(245, 106, 59, 0.2);
+  user-select: none;
 }
 
 .user-menu-item:hover {
@@ -426,6 +431,7 @@ html {
   pointer-events: none;
   display: block;
   -webkit-overflow-scrolling: touch;
+  touch-action: auto;
 }
 
 .settings-menu.active {
@@ -433,6 +439,7 @@ html {
   visibility: visible;
   transform: translateY(0) scale(1);
   pointer-events: auto;
+  touch-action: auto;
 }
 
 .settings-menu-header {
@@ -499,6 +506,9 @@ html {
   width: 100%;
   position: relative;
   overflow: hidden;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(245, 106, 59, 0.2);
+  user-select: none;
 }
 
 .settings-action-btn::before {
@@ -754,8 +764,17 @@ html {
   right: 20px;
   width: 48px;
   height: 48px;
-  opacity: 0.1;
-  z-index: -1;
+  opacity: 0.15;
+  z-index: 0;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metric-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .metric-label {
@@ -794,6 +813,14 @@ html {
 
 .change-icon {
   font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.change-icon svg {
+  width: 12px;
+  height: 12px;
 }
 
 .change-value {
@@ -1033,6 +1060,64 @@ body.style-institutionnel .metric-icon {
   height: auto !important;
 }
 
+.chart-wrapper-costs {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.costs-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.costs-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: var(--color-bg-light);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.costs-legend-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--color-white);
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.costs-legend-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.costs-legend-label {
+  font-family: 'F37Gruffy', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-black);
+}
+
+.costs-legend-value {
+  font-family: 'F37Gruffy', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-black);
+  margin-left: 8px;
+}
+
 /* Style Premium pour graphiques */
 body.style-premium .chart-container {
   border-radius: 12px;
@@ -1084,11 +1169,52 @@ body.style-institutionnel .chart-title {
 .table-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 15px;
   position: relative;
+  flex-direction: column;
+}
+
+.insights-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+  width: 100%;
+}
+
+.insight-tab {
+  padding: 10px 20px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text);
+  font-family: 'F37Gruffy', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.insight-tab:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(245, 106, 59, 0.05);
+}
+
+.insight-tab.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(245, 106, 59, 0.2);
+}
+
+.insight-tab.active:hover {
+  background: #E55A2B;
+  box-shadow: 0 4px 12px rgba(245, 106, 59, 0.3);
 }
 
 .table-title {
@@ -1960,7 +2086,33 @@ body.style-institutionnel .data-table tbody tr:nth-child(even) {
   .user-menu {
     max-width: calc(100vw - 40px);
     max-height: 60vh;
-    z-index: 9999;
+    z-index: 10001;
+    position: fixed !important;
+  }
+  
+  /* S'assurer que les menus sont au-dessus de l'overlay sur mobile */
+  .settings-menu.active,
+  .user-menu.active {
+    z-index: 10001 !important;
+    pointer-events: auto !important;
+    touch-action: auto !important;
+  }
+  
+  .menu-overlay {
+    z-index: 10000;
+  }
+  
+  /* S'assurer que les éléments interactifs dans les menus fonctionnent */
+  .settings-menu *,
+  .user-menu * {
+    pointer-events: auto;
+    touch-action: auto;
+  }
+  
+  .settings-action-btn,
+  .user-menu-item {
+    -webkit-tap-highlight-color: rgba(245, 106, 59, 0.3);
+    cursor: pointer;
   }
 
   .dashboard-main {

@@ -190,46 +190,45 @@ function getChartColors() {
   }
 }
 
-// Données de test
-function getRevenueData() {
+// Données de test - Live Hash Rate
+function getHashRateData() {
   const labels = [];
   const data = [];
   
-  // Ligne horizontale avec oscillation entre 134k, 135k, 136k dollars
-  // Période: du 01/11 au 30/11 (novembre)
-  // Base: 135,000 dollars avec oscillation entre 134k et 136k
-  const baseValue = 135000; // Valeur de base à 135k dollars
-  const oscillationRange = 1000; // Oscillation de ±1k dollars
+  // Hash Rate en temps réel avec variation naturelle
+  // Base: 342.8 TH/s avec oscillation entre 320 et 365 TH/s
+  const baseValue = 342.8; // Valeur de base
+  const oscillationRange = 22.5; // Oscillation de ±22.5 TH/s
   
-  // Créer les dates du 01/11 au 30/11
-  // Année: utiliser l'année actuelle ou 2024 par défaut
-  const currentYear = new Date().getFullYear();
-  const startDate = new Date(currentYear, 10, 1); // Novembre = mois 10 (0-indexed)
-  const endDate = new Date(currentYear, 10, 30);  // 30 novembre
-  
-  // Générer 30 points de données (du 01/11 au 30/11)
-  for (let day = 1; day <= 30; day++) {
-    const date = new Date(currentYear, 10, day); // Novembre = mois 10
-    labels.push(date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
+  // Générer 30 points de données (30 dernières heures)
+  for (let hour = 0; hour < 30; hour++) {
+    const now = new Date();
+    const date = new Date(now.getTime() - (29 - hour) * 60 * 60 * 1000);
+    labels.push(date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
     
-    // Oscillation sinusoïdale entre 134k et 136k dollars
-    // Utilise une double sinusoïde pour créer une variation naturelle
-    const oscillation1 = Math.sin((day / 30) * Math.PI * 2) * oscillationRange;
-    const oscillation2 = Math.sin((day / 15) * Math.PI * 2) * (oscillationRange * 0.5);
-    const value = baseValue + oscillation1 + oscillation2;
+    // Oscillation sinusoïdale avec variation naturelle
+    const oscillation1 = Math.sin((hour / 30) * Math.PI * 2) * oscillationRange;
+    const oscillation2 = Math.sin((hour / 10) * Math.PI * 2) * (oscillationRange * 0.4);
+    const randomNoise = (Math.random() - 0.5) * 5; // Bruit aléatoire léger
+    const value = baseValue + oscillation1 + oscillation2 + randomNoise;
     
-    // S'assurer que la valeur reste entre 134k et 136k
-    const clampedValue = Math.max(134000, Math.min(136000, value));
-    data.push(Math.round(clampedValue));
+    // S'assurer que la valeur reste dans une plage raisonnable
+    const clampedValue = Math.max(320, Math.min(365, value));
+    data.push(Math.round(clampedValue * 10) / 10); // Arrondir à 1 décimale
   }
   
   return { labels, data };
 }
 
+// Alias pour compatibilité
+function getRevenueData() {
+  return getHashRateData();
+}
+
 function getCostsData() {
   return {
-    labels: ['Énergie', 'Maintenance', 'Infrastructure', 'Personnel', 'Autres'],
-    data: [45, 25, 15, 10, 5]
+    labels: ['Mining', 'Électricité'],
+    data: [65, 35]
   };
 }
 
@@ -300,23 +299,22 @@ function getChartConfig(type, data, colors) {
   };
 
   if (type === 'line') {
-    // Ligne droite parfaite à 41,000 dollars
-    // Du 01/11 au 30/11 - Pas d'oscillation, ligne droite
+    // Graphique Live Hash Rate
     return {
       type: 'line',
       data: {
         labels: data.labels,
         datasets: [
           {
-            label: 'Revenus',
+            label: 'Hash Rate (TH/s)',
             data: data.data,
-            borderColor: '#F56A3B', // Orange
+            borderColor: '#F56A3B', // Orange premium
             backgroundColor: `rgba(245, 106, 59, 0.1)`,
             borderWidth: 2,
             fill: true,
-            tension: 0.4, // Courbe lisse pour l'oscillation entre 134k, 135k, 136k dollars
-            pointRadius: 4,
-            pointHoverRadius: 7,
+            tension: 0.4, // Courbe lisse
+            pointRadius: 3,
+            pointHoverRadius: 6,
             pointBackgroundColor: '#F56A3B',
             pointBorderColor: '#FFFFFF',
             pointBorderWidth: 2
@@ -328,6 +326,33 @@ function getChartConfig(type, data, colors) {
         animation: {
           duration: 1000,
           easing: 'easeOutQuart'
+        },
+        scales: {
+          ...commonOptions.scales,
+          y: {
+            ...commonOptions.scales.y,
+            title: {
+              display: true,
+              text: 'Hash Rate (TH/s)',
+              color: colors.secondary,
+              font: {
+                family: 'F37Gruffy',
+                size: 12
+              }
+            }
+          },
+          x: {
+            ...commonOptions.scales.x,
+            title: {
+              display: true,
+              text: 'Temps',
+              color: colors.secondary,
+              font: {
+                family: 'F37Gruffy',
+                size: 12
+              }
+            }
+          }
         }
       }
     };
@@ -339,11 +364,8 @@ function getChartConfig(type, data, colors) {
         datasets: [{
           data: data.data,
           backgroundColor: [
-            colors.primary,
-            colors.secondary,
-            colors.tertiary,
-            colors.secondary,
-            colors.accent
+            '#F56A3B', // Orange pour Mining
+            '#000000'  // Noir pour Électricité
           ],
           borderWidth: currentStyle === 'institutionnel' ? 2 : 0,
           borderColor: '#FFFFFF'
@@ -351,6 +373,12 @@ function getChartConfig(type, data, colors) {
       },
       options: {
         ...commonOptions,
+        plugins: {
+          ...commonOptions.plugins,
+          legend: {
+            display: false // On utilise notre légende personnalisée
+          }
+        },
         animation: {
           animateRotate: true,
           duration: 1000
@@ -370,10 +398,10 @@ function updateCharts() {
   
   const colors = getChartColors();
   
-  // Graphique Revenus
+  // Graphique Live Hash Rate
   const revenueCtx = document.getElementById('revenue-chart');
   if (revenueCtx) {
-    const revenueData = getRevenueData();
+    const hashRateData = getHashRateData();
     
     if (revenueChart) {
       revenueChart.destroy();
@@ -382,8 +410,8 @@ function updateCharts() {
     // Attendre que le conteneur soit visible et dimensionné
     const chartWrapper = revenueCtx.closest('.chart-wrapper');
     if (chartWrapper && chartWrapper.offsetWidth > 0) {
-      revenueChart = new Chart(revenueCtx, getChartConfig('line', revenueData, colors));
-      console.log('✅ Revenue chart created/updated');
+      revenueChart = new Chart(revenueCtx, getChartConfig('line', hashRateData, colors));
+      console.log('✅ Live Hash Rate chart created/updated');
       
       // Forcer le redimensionnement après création
       setTimeout(() => {
@@ -392,12 +420,12 @@ function updateCharts() {
         }
       }, 100);
     } else {
-      console.warn('⚠️ Revenue chart wrapper not ready');
+      console.warn('⚠️ Hash Rate chart wrapper not ready');
       // Réessayer après un court délai
       setTimeout(() => updateCharts(), 200);
     }
   } else {
-    console.warn('⚠️ Revenue chart canvas not found');
+    console.warn('⚠️ Hash Rate chart canvas not found');
   }
   
   // Graphique Coûts
@@ -497,25 +525,82 @@ const pageData = {
   premium: {
     name: 'Dashboard',
     metrics: [
-      { label: 'REVENUS', value: '€125,430', change: '12.5%', positive: true },
-      { label: 'HASHRATE', value: '2.45 TH/s', change: '8.3%', positive: true },
-      { label: 'ACTIFS MINIERS', value: '1,247', change: '5.2%', positive: true },
-      { label: 'EFFICACITÉ', value: '94.2%', change: '2.1%', positive: false }
+      { label: 'TOTAL REVENUE', value: '€594,120', change: '12.5%', positive: true },
+      { label: 'TOTAL HASH RATE', value: '342.8 TH/s', change: '8.3%', positive: true },
+      { label: 'TOTAL MINERS', value: '1,247', change: '5.2%', positive: true },
+      { label: 'UPTIME', value: '99.2%', change: '0.5%', positive: true }
     ],
     charts: {
-      title1: 'Évolution des Revenus',
+      title1: 'Live Hash Rate',
       title3: 'Répartition des Coûts'
     },
+    insights: {
+      deployments: {
+        title: 'Last Deployments',
+        headers: ['ID Batch', 'Type', 'Hashrate', 'Date', 'Statut'],
+        data: [
+          ['BATCH-047', 'Bitcoin', '3.2 TH/s', '2025-01-15 14:32', 'Actif'],
+          ['BATCH-046', 'Ethereum', '2.8 TH/s', '2025-01-14 11:20', 'Actif'],
+          ['BATCH-045', 'Bitcoin', '4.1 TH/s', '2025-01-13 09:15', 'Actif'],
+          ['BATCH-044', 'Litecoin', '1.5 TH/s', '2025-01-12 16:45', 'En cours'],
+          ['BATCH-043', 'Bitcoin', '2.9 TH/s', '2025-01-11 10:30', 'Actif']
+        ]
+      },
+      connections: {
+        title: 'Last Connections',
+        headers: ['Client', 'Type', 'Hashrate', 'Date Connexion', 'Statut'],
+        data: [
+          ['TechCorp Inc.', 'Enterprise', '45.2 TH/s', '2025-01-15 15:22', 'Connecté'],
+          ['CryptoMining Ltd', 'Premium', '18.5 TH/s', '2025-01-15 14:18', 'Connecté'],
+          ['BlockChain Pro', 'Standard', '8.3 TH/s', '2025-01-15 13:45', 'Connecté'],
+          ['Digital Assets', 'Premium', '15.2 TH/s', '2025-01-15 12:30', 'Déconnecté'],
+          ['Mining Solutions', 'Enterprise', '32.8 TH/s', '2025-01-15 11:15', 'Connecté']
+        ]
+      },
+      onboard: {
+        title: 'Last Customer Onboard',
+        headers: ['Client', 'Type', 'Contrat', 'Date', 'Hashrate'],
+        data: [
+          ['Crypto Ventures', 'Premium', 'Mensuel', '2025-01-15', '22.1 TH/s'],
+          ['BlockTech Systems', 'Standard', 'Mensuel', '2025-01-14', '5.8 TH/s'],
+          ['Mining Corp', 'Enterprise', 'Annuel', '2025-01-13', '68.9 TH/s'],
+          ['Digital Mining Co', 'Premium', 'Trimestriel', '2025-01-12', '16.7 TH/s'],
+          ['Crypto Solutions', 'Standard', 'Mensuel', '2025-01-11', '7.2 TH/s']
+        ]
+      },
+      profitability: {
+        title: 'Best Profitability Batches',
+        headers: ['ID Batch', 'Type', 'Revenus', 'Coûts', 'Marge', 'ROI'],
+        data: [
+          ['BATCH-001', 'Bitcoin', '€125,430', '€45,230', '€80,200', '177.3%'],
+          ['BATCH-015', 'Bitcoin', '€118,200', '€48,100', '€70,100', '145.8%'],
+          ['BATCH-023', 'Ethereum', '€112,500', '€46,800', '€65,700', '140.4%'],
+          ['BATCH-008', 'Bitcoin', '€108,900', '€47,200', '€61,700', '130.7%'],
+          ['BATCH-031', 'Bitcoin', '€105,300', '€49,100', '€56,200', '114.5%']
+        ]
+      },
+      newest: {
+        title: 'Newest Batches',
+        headers: ['ID Batch', 'Type', 'Hashrate', 'Date Création', 'Statut'],
+        data: [
+          ['BATCH-047', 'Bitcoin', '3.2 TH/s', '2025-01-15', 'Actif'],
+          ['BATCH-046', 'Ethereum', '2.8 TH/s', '2025-01-14', 'Actif'],
+          ['BATCH-045', 'Bitcoin', '4.1 TH/s', '2025-01-13', 'Actif'],
+          ['BATCH-044', 'Litecoin', '1.5 TH/s', '2025-01-12', 'En cours'],
+          ['BATCH-043', 'Bitcoin', '2.9 TH/s', '2025-01-11', 'Actif']
+        ]
+      }
+    },
     table: {
-      title: 'Activités Récentes',
-      headers: ['Date', 'Type', 'Montant', 'Statut'],
-      filters: ['Tous', 'Revenus', 'Dépenses', 'Maintenance'],
+      title: 'Operational Insights',
+      headers: ['ID Batch', 'Type', 'Hashrate', 'Date', 'Statut'],
+      filters: ['Tous', 'Actif', 'En cours', 'Terminé'],
       data: [
-        ['2025-01-15', 'Revenus', '€12,450', 'Complété'],
-        ['2025-01-14', 'Maintenance', '€2,300', 'En cours'],
-        ['2025-01-13', 'Revenus', '€11,890', 'Complété'],
-        ['2025-01-12', 'Dépenses', '€4,200', 'Complété'],
-        ['2025-01-11', 'Revenus', '€13,100', 'Complété']
+        ['BATCH-047', 'Bitcoin', '3.2 TH/s', '2025-01-15', 'Actif'],
+        ['BATCH-046', 'Ethereum', '2.8 TH/s', '2025-01-14', 'Actif'],
+        ['BATCH-045', 'Bitcoin', '4.1 TH/s', '2025-01-13', 'Actif'],
+        ['BATCH-044', 'Litecoin', '1.5 TH/s', '2025-01-12', 'En cours'],
+        ['BATCH-043', 'Bitcoin', '2.9 TH/s', '2025-01-11', 'Actif']
       ]
     }
   },
@@ -674,17 +759,25 @@ function updatePageContent(pageStyle) {
 // Mise à jour des métriques
 function updateMetrics(metrics) {
   const metricBoxes = document.querySelectorAll('.metric-box');
-  const metricTypes = ['revenue', 'hashrate', 'miners', 'efficiency'];
+  const metricTypes = ['revenue', 'hashrate', 'miners', 'uptime'];
   
   metricBoxes.forEach((box, index) => {
     if (index < metrics.length) {
       const metric = metrics[index];
-      box.querySelector('.metric-label').textContent = metric.label;
-      box.querySelector('.metric-value').textContent = metric.value;
-      
+      const labelElement = box.querySelector('.metric-label');
+      const valueElement = box.querySelector('.metric-value');
       const changeElement = box.querySelector('.metric-change');
-      changeElement.className = `metric-change ${metric.positive ? 'positive' : 'negative'}`;
-      changeElement.querySelector('.change-value').textContent = metric.change;
+      
+      if (labelElement) labelElement.textContent = metric.label;
+      if (valueElement) valueElement.textContent = metric.value;
+      
+      if (changeElement) {
+        changeElement.className = `metric-change ${metric.positive ? 'positive' : 'negative'}`;
+        const changeValueElement = changeElement.querySelector('.change-value');
+        if (changeValueElement) {
+          changeValueElement.textContent = metric.change;
+        }
+      }
       
       // Mettre à jour l'attribut data-metric pour la barre colorée
       if (index < metricTypes.length) {
@@ -696,8 +789,16 @@ function updateMetrics(metrics) {
 
 // Mise à jour des titres de graphiques
 function updateChartTitles(charts) {
-  document.getElementById('chart-title-1').textContent = charts.title1;
-  document.getElementById('chart-title-3').textContent = charts.title3;
+  const title1 = document.getElementById('chart-title-1');
+  const title3 = document.getElementById('chart-title-3');
+  
+  if (title1 && charts.title1) {
+    title1.textContent = charts.title1;
+  }
+  
+  if (title3 && charts.title3) {
+    title3.textContent = charts.title3;
+  }
 }
 
 // Mise à jour du tableau
@@ -828,6 +929,42 @@ function updatePagination(totalItems) {
 let filteredTableData = null;
 let currentSearchTerm = '';
 let currentFilterValue = 'all';
+
+// Fonction pour initialiser les onglets Operational Insights
+function initInsightsTabs() {
+  const insightTabs = document.querySelectorAll('.insight-tab');
+  
+  if (insightTabs.length === 0) {
+    console.warn('⚠️ No insight tabs found');
+    return;
+  }
+  
+  console.log('✅ Initializing insight tabs...');
+  
+  insightTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabName = tab.dataset.tab;
+      console.log('📑 Insight tab clicked:', tabName);
+      
+      // Mettre à jour l'état actif
+      insightTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      // Mettre à jour le tableau selon l'onglet
+      if (currentStyle === 'premium' && pageData.premium.insights) {
+        const insightData = pageData.premium.insights[tabName];
+        if (insightData) {
+          updateTable({
+            title: 'Operational Insights',
+            headers: insightData.headers,
+            filters: ['Tous', 'Actif', 'En cours', 'Terminé'],
+            data: insightData.data
+          });
+        }
+      }
+    });
+  });
+}
 
 // Fonction pour initialiser les event listeners des filtres et pagination
 function initTableControls() {
@@ -2118,19 +2255,23 @@ function initUserMenu() {
           userMenu.style.top = (rect.bottom + 10) + 'px';
           userMenu.style.right = '20px';
           userMenu.style.left = 'auto';
-          userMenu.style.zIndex = '9999';
+          userMenu.style.zIndex = '10001';
           userMenu.style.maxHeight = '60vh';
+          userMenu.style.pointerEvents = 'auto';
+          userMenu.style.touchAction = 'auto';
           
           // Afficher l'overlay
           const overlay = document.getElementById('menu-overlay');
           if (overlay) {
             overlay.classList.add('active');
+            overlay.style.zIndex = '10000';
           }
         } else {
           userMenu.style.position = 'absolute';
           userMenu.style.top = 'calc(100% + 10px)';
           userMenu.style.right = '0';
           userMenu.style.left = 'auto';
+          userMenu.style.zIndex = '';
         }
       }
     });
@@ -2432,13 +2573,16 @@ function initSettingsMenu() {
         settingsMenu.style.top = (rect.bottom + 10) + 'px';
         settingsMenu.style.right = '20px';
         settingsMenu.style.left = 'auto';
-        settingsMenu.style.zIndex = '9999';
+        settingsMenu.style.zIndex = '10001';
         settingsMenu.style.maxHeight = '60vh';
+        settingsMenu.style.pointerEvents = 'auto';
+        settingsMenu.style.touchAction = 'auto';
         
         // Afficher l'overlay
         const overlay = document.getElementById('menu-overlay');
         if (overlay) {
           overlay.classList.add('active');
+          overlay.style.zIndex = '10000';
         }
       } else {
         settingsMenu.style.position = 'absolute';
@@ -2446,6 +2590,7 @@ function initSettingsMenu() {
         settingsMenu.style.right = '0';
         settingsMenu.style.left = 'auto';
         settingsMenu.style.maxHeight = '80vh';
+        settingsMenu.style.zIndex = '';
       }
     }
   });
@@ -2663,6 +2808,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initUserMenu();
   initSettingsMenu();
   initTableControls(); // Initialiser les contrôles de tableau
+  initInsightsTabs(); // Initialiser les onglets Operational Insights
   updateUserDisplay();
   updatePageContent(currentStyle);
   
@@ -2683,9 +2829,36 @@ document.addEventListener('DOMContentLoaded', () => {
   // Gestion de l'overlay pour fermer les menus
   const menuOverlay = document.getElementById('menu-overlay');
   if (menuOverlay) {
-    menuOverlay.addEventListener('click', () => {
-      closeSettingsMenu();
-      closeUserMenu();
+    menuOverlay.addEventListener('click', (e) => {
+      // Ne fermer que si on clique directement sur l'overlay, pas sur les menus
+      if (e.target === menuOverlay) {
+        closeSettingsMenu();
+        closeUserMenu();
+      }
+    });
+  }
+  
+  // Empêcher la fermeture des menus quand on clique dessus
+  const settingsMenu = document.getElementById('settings-menu');
+  const userMenu = document.getElementById('user-menu');
+  
+  if (settingsMenu) {
+    // Utiliser touchstart et click pour gérer les interactions tactiles
+    settingsMenu.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+    }, { passive: true });
+    settingsMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+  }
+  
+  if (userMenu) {
+    // Utiliser touchstart et click pour gérer les interactions tactiles
+    userMenu.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+    }, { passive: true });
+    userMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
     });
   }
   
