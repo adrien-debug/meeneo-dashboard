@@ -195,9 +195,11 @@ function getRevenueData() {
   const labels = [];
   const data = [];
   
-  // Ligne droite parfaite à 41,000 dollars
+  // Ligne horizontale avec oscillation entre 134k, 135k, 136k dollars
   // Période: du 01/11 au 30/11 (novembre)
-  const horizontalValue = 41000; // Prix fixe à 41k dollars
+  // Base: 135,000 dollars avec oscillation entre 134k et 136k
+  const baseValue = 135000; // Valeur de base à 135k dollars
+  const oscillationRange = 1000; // Oscillation de ±1k dollars
   
   // Créer les dates du 01/11 au 30/11
   // Année: utiliser l'année actuelle ou 2024 par défaut
@@ -210,8 +212,15 @@ function getRevenueData() {
     const date = new Date(currentYear, 10, day); // Novembre = mois 10
     labels.push(date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
     
-    // Ligne parfaitement droite à 41,000 dollars (pas d'oscillation)
-    data.push(horizontalValue);
+    // Oscillation sinusoïdale entre 134k et 136k dollars
+    // Utilise une double sinusoïde pour créer une variation naturelle
+    const oscillation1 = Math.sin((day / 30) * Math.PI * 2) * oscillationRange;
+    const oscillation2 = Math.sin((day / 15) * Math.PI * 2) * (oscillationRange * 0.5);
+    const value = baseValue + oscillation1 + oscillation2;
+    
+    // S'assurer que la valeur reste entre 134k et 136k
+    const clampedValue = Math.max(134000, Math.min(136000, value));
+    data.push(Math.round(clampedValue));
   }
   
   return { labels, data };
@@ -305,7 +314,7 @@ function getChartConfig(type, data, colors) {
             backgroundColor: `rgba(245, 106, 59, 0.1)`,
             borderWidth: 2,
             fill: true,
-            tension: 0, // Ligne parfaitement droite (0% courbure)
+            tension: 0.4, // Courbe lisse pour l'oscillation entre 134k, 135k, 136k dollars
             pointRadius: 4,
             pointHoverRadius: 7,
             pointBackgroundColor: '#F56A3B',
@@ -766,6 +775,12 @@ function updateTable(tableData) {
 function renderTable(filteredData = null) {
   const data = filteredData || currentTableData;
   const tbody = document.getElementById('table-body');
+  
+  if (!tbody) {
+    console.error('❌ Table body element not found');
+    return;
+  }
+  
   tbody.innerHTML = '';
   
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -987,12 +1002,14 @@ function handleViewOperation(operationName, operationData) {
   
   modalTitle.textContent = operationName;
   
+  // Structure des données: ['ID Opération', 'Type', 'Statut', 'Hashrate', 'Dernière MAJ']
+  // Indices: 0=ID, 1=Type, 2=Statut, 3=Hashrate, 4=Dernière MAJ
   const details = [
     { label: 'ID Opération', value: operationData[0] },
     { label: 'Type', value: operationData[1] },
-    { label: 'Statut', value: operationData[3] },
-    { label: 'Hashrate', value: operationData[4] },
-    { label: 'Dernière MAJ', value: operationData[5] }
+    { label: 'Statut', value: operationData[2] },
+    { label: 'Hashrate', value: operationData[3] },
+    { label: 'Dernière MAJ', value: operationData[4] }
   ];
   
   let html = generateModalContent(details, operationName, 'operation');
@@ -2017,6 +2034,12 @@ function formatDate(dateString) {
 // Fermeture de la modal
 function closeModal() {
   const modal = document.getElementById('customer-modal');
+  
+  if (!modal) {
+    console.warn('⚠️ Modal element not found, cannot close');
+    return;
+  }
+  
   modal.classList.remove('active');
   document.body.style.overflow = '';
 }
