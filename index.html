@@ -16,12 +16,56 @@
       </div>
       <div class="style-selector">
         <button class="style-btn active" data-style="premium">Dashboard</button>
+        <button class="style-btn" data-style="cockpit">Cockpit</button>
         <button class="style-btn" data-style="dynamic">Profitability Index</button>
         <button class="style-btn" data-style="institutionnel">Mining Batches</button>
         <button class="style-btn" data-style="customers">Customers</button>
       </div>
       <div class="user-info">
-        <span class="user-name">Utilisateur</span>
+        <div class="user-profile" id="user-profile">
+          <div class="user-avatar">
+            <span class="user-initials">AD</span>
+          </div>
+          <div class="user-details">
+            <span class="user-name">Adrien Debug</span>
+            <span class="user-status">
+              <span class="status-badge status-active">Actif</span>
+              <span class="status-badge status-premium">Premium</span>
+            </span>
+          </div>
+          <button class="user-menu-toggle" id="user-menu-toggle">▼</button>
+        </div>
+        <div class="user-menu" id="user-menu">
+          <div class="user-menu-header">
+            <div class="user-menu-avatar">
+              <span class="user-initials">AD</span>
+            </div>
+            <div class="user-menu-info">
+              <div class="user-menu-name">Adrien Debug</div>
+              <div class="user-menu-email">adrien@meeneo.io</div>
+              <div class="user-menu-status">
+                <span class="status-badge status-active">Actif</span>
+                <span class="status-badge status-premium">Premium</span>
+              </div>
+            </div>
+          </div>
+          <div class="user-menu-divider"></div>
+          <div class="user-menu-items">
+            <a href="#" class="user-menu-item" id="view-profile">
+              <span>👤</span> Mon Profil
+            </a>
+            <a href="#" class="user-menu-item" id="settings">
+              <span>⚙️</span> Paramètres
+            </a>
+            <a href="#" class="user-menu-item" id="subscription">
+              <span>⭐</span> Abonnement Premium
+            </a>
+            <div class="user-menu-divider"></div>
+            <a href="#" class="user-menu-item" id="logout">
+              <span>🚪</span> Déconnexion
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -140,6 +184,20 @@
       </div>
     </section>
   </main>
+
+  <!-- Modal Customer Details -->
+  <div id="customer-modal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-customer-name">Détails du Client</h2>
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Contenu dynamique -->
+      </div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="dashboard-footer">
