@@ -569,30 +569,8 @@ function updateTable(tableData) {
   const tableTitle = document.getElementById('table-title');
   tableTitle.textContent = tableData.title;
   
-  // Ajouter bouton "Ajouter" pour toutes les pages
-  const addButtonTexts = {
-    'premium': '+ Ajouter Activité',
-    'cockpit': '+ Ajouter Opération',
-    'dynamic': '+ Ajouter Analyse',
-    'institutionnel': '+ Ajouter Batch',
-    'customers': '+ Ajouter Client'
-  };
-  
-  // Supprimer l'ancien bouton s'il existe
-  const oldBtn = document.getElementById('add-item-btn');
-  if (oldBtn) {
-    oldBtn.remove();
-  }
-  
-  // Créer le nouveau bouton
-  const addBtn = document.createElement('button');
-  addBtn.id = 'add-item-btn';
-  addBtn.className = 'add-customer-btn';
-  addBtn.textContent = addButtonTexts[currentStyle] || '+ Ajouter';
-  addBtn.addEventListener('click', () => handleAddItem(currentStyle));
-  // Ajouter dans le header du tableau
-  const tableHeader = tableTitle.parentElement;
-  tableHeader.appendChild(addBtn);
+  // Les boutons d'ajout sont maintenant centralisés dans le menu Settings
+  // Plus besoin de boutons individuels dans les tableaux
   
   // Mise à jour des headers
   const headersRow = document.getElementById('table-headers');
@@ -1807,8 +1785,12 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Fermeture avec la touche Escape
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('active')) {
-      closeModal();
+    if (e.key === 'Escape') {
+      if (modal.classList.contains('active')) {
+        closeModal();
+      }
+      // Fermer aussi le menu Settings si ouvert
+      closeSettingsMenu();
     }
   });
 });
@@ -1852,9 +1834,9 @@ function initUserMenu() {
       showUserProfile();
     });
     
-    document.getElementById('settings')?.addEventListener('click', (e) => {
+    document.getElementById('open-settings-from-menu')?.addEventListener('click', (e) => {
       e.preventDefault();
-      showNotification('Paramètres - Fonctionnalité à venir', 'info');
+      openSettingsMenu();
       closeUserMenu();
     });
     
@@ -2072,11 +2054,94 @@ function updateUserDisplay() {
 }
 
 // ============================================
+// GESTION DU MENU SETTINGS
+// ============================================
+function initSettingsMenu() {
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsMenu = document.getElementById('settings-menu');
+  
+  if (settingsBtn && settingsMenu) {
+    // Toggle du menu au clic sur le bouton
+    settingsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      settingsBtn.classList.toggle('active');
+      settingsMenu.classList.toggle('active');
+    });
+    
+    // Fermer le menu en cliquant ailleurs
+    document.addEventListener('click', (e) => {
+      if (!settingsBtn.contains(e.target) && !settingsMenu.contains(e.target)) {
+        settingsBtn.classList.remove('active');
+        settingsMenu.classList.remove('active');
+      }
+    });
+    
+    // Gestionnaires d'événements pour les actions d'ajout
+    const actionButtons = settingsMenu.querySelectorAll('.settings-action-btn');
+    actionButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const action = btn.getAttribute('data-action');
+        handleSettingsAction(action);
+      });
+    });
+  }
+}
+
+// Ouvrir le menu Settings
+function openSettingsMenu() {
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsMenu = document.getElementById('settings-menu');
+  
+  if (settingsBtn && settingsMenu) {
+    settingsBtn.classList.add('active');
+    settingsMenu.classList.add('active');
+  }
+}
+
+// Fermer le menu Settings
+function closeSettingsMenu() {
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsMenu = document.getElementById('settings-menu');
+  
+  if (settingsBtn && settingsMenu) {
+    settingsBtn.classList.remove('active');
+    settingsMenu.classList.remove('active');
+  }
+}
+
+// Gérer les actions du menu Settings
+function handleSettingsAction(action) {
+  closeSettingsMenu();
+  
+  switch(action) {
+    case 'add-activity':
+      handleAddActivity();
+      break;
+    case 'add-operation':
+      handleAddOperation();
+      break;
+    case 'add-analysis':
+      handleAddAnalysis();
+      break;
+    case 'add-batch':
+      handleAddBatch();
+      break;
+    case 'add-customer':
+      handleAddCustomer();
+      break;
+    default:
+      showNotification('Action non reconnue', 'info');
+  }
+}
+
+// ============================================
 // INITIALISATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
   initStyle();
   initUserMenu();
+  initSettingsMenu();
   updateUserDisplay();
   updatePageContent(currentStyle);
   updateCharts();
