@@ -2078,6 +2078,12 @@ function initUserMenu() {
       if (isActive) {
         userProfile.classList.remove('active');
         userMenu.classList.remove('active');
+        
+        // Cacher l'overlay
+        const overlay = document.getElementById('menu-overlay');
+        if (overlay) {
+          overlay.classList.remove('active');
+        }
       } else {
         userProfile.classList.add('active');
         userMenu.classList.add('active');
@@ -2089,7 +2095,14 @@ function initUserMenu() {
           userMenu.style.top = (rect.bottom + 10) + 'px';
           userMenu.style.right = '20px';
           userMenu.style.left = 'auto';
-          userMenu.style.zIndex = '10000';
+          userMenu.style.zIndex = '9999';
+          userMenu.style.maxHeight = '60vh';
+          
+          // Afficher l'overlay
+          const overlay = document.getElementById('menu-overlay');
+          if (overlay) {
+            overlay.classList.add('active');
+          }
         } else {
           userMenu.style.position = 'absolute';
           userMenu.style.top = 'calc(100% + 10px)';
@@ -2132,6 +2145,8 @@ function initUserMenu() {
 function closeUserMenu() {
   const userProfile = document.getElementById('user-profile');
   const userMenu = document.getElementById('user-menu');
+  const overlay = document.getElementById('menu-overlay');
+  
   if (userProfile && userMenu) {
     userProfile.classList.remove('active');
     userMenu.classList.remove('active');
@@ -2141,6 +2156,12 @@ function closeUserMenu() {
     userMenu.style.right = '';
     userMenu.style.left = '';
     userMenu.style.zIndex = '';
+    userMenu.style.maxHeight = '';
+  }
+  
+  // Cacher l'overlay
+  if (overlay) {
+    overlay.classList.remove('active');
   }
 }
 
@@ -2370,6 +2391,12 @@ function initSettingsMenu() {
       console.log('📂 Closing settings menu');
       settingsBtn.classList.remove('active');
       settingsMenu.classList.remove('active');
+      
+      // Cacher l'overlay
+      const overlay = document.getElementById('menu-overlay');
+      if (overlay) {
+        overlay.classList.remove('active');
+      }
     } else {
       console.log('📂 Opening settings menu');
       settingsBtn.classList.add('active');
@@ -2382,12 +2409,20 @@ function initSettingsMenu() {
         settingsMenu.style.top = (rect.bottom + 10) + 'px';
         settingsMenu.style.right = '20px';
         settingsMenu.style.left = 'auto';
-        settingsMenu.style.zIndex = '10000';
+        settingsMenu.style.zIndex = '9999';
+        settingsMenu.style.maxHeight = '60vh';
+        
+        // Afficher l'overlay
+        const overlay = document.getElementById('menu-overlay');
+        if (overlay) {
+          overlay.classList.add('active');
+        }
       } else {
         settingsMenu.style.position = 'absolute';
         settingsMenu.style.top = 'calc(100% + 10px)';
         settingsMenu.style.right = '0';
         settingsMenu.style.left = 'auto';
+        settingsMenu.style.maxHeight = '80vh';
       }
     }
   });
@@ -2432,6 +2467,7 @@ function openSettingsMenu() {
 function closeSettingsMenu() {
   const settingsBtn = document.getElementById('settings-btn');
   const settingsMenu = document.getElementById('settings-menu');
+  const overlay = document.getElementById('menu-overlay');
   
   if (settingsBtn && settingsMenu) {
     settingsBtn.classList.remove('active');
@@ -2442,6 +2478,12 @@ function closeSettingsMenu() {
     settingsMenu.style.right = '';
     settingsMenu.style.left = '';
     settingsMenu.style.zIndex = '';
+    settingsMenu.style.maxHeight = '';
+  }
+  
+  // Cacher l'overlay
+  if (overlay) {
+    overlay.classList.remove('active');
   }
 }
 
@@ -2614,6 +2656,15 @@ document.addEventListener('DOMContentLoaded', () => {
   initChartsWhenReady();
   
   initScrollAnimations(); // Initialiser les animations au scroll
+  
+  // Gestion de l'overlay pour fermer les menus
+  const menuOverlay = document.getElementById('menu-overlay');
+  if (menuOverlay) {
+    menuOverlay.addEventListener('click', () => {
+      closeSettingsMenu();
+      closeUserMenu();
+    });
+  }
   
   // Gestion du redimensionnement de la fenêtre pour les graphiques
   let resizeTimeout;
