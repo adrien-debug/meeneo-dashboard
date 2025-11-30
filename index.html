@@ -14,13 +14,12 @@
       <div class="logo">
         <img src="https://cdn.prod.website-files.com/687f61063dcf7ce10f7c8821/6880dc89d5bcec7bc161af43_meeneo-logo.svg" alt="Meeneo logo">
       </div>
-      <nav class="header-nav">
-        <ul>
-          <li><a href="#overview">Vue d'ensemble</a></li>
-          <li><a href="#analytics">Analytics</a></li>
-          <li><a href="#settings">Paramètres</a></li>
-        </ul>
-      </nav>
+      <div class="style-selector">
+        <button class="style-btn active" data-style="premium">Dashboard</button>
+        <button class="style-btn" data-style="dynamic">Profitability Index</button>
+        <button class="style-btn" data-style="institutionnel">Mining Batches</button>
+        <button class="style-btn" data-style="customers">Customers</button>
+      </div>
       <div class="user-info">
         <span class="user-name">Utilisateur</span>
       </div>
@@ -29,13 +28,6 @@
 
   <!-- Main Dashboard Content -->
   <main class="dashboard-main">
-    <!-- Style Selector -->
-    <div class="style-selector">
-      <button class="style-btn active" data-style="premium">Dashboard</button>
-      <button class="style-btn" data-style="dynamic">Profitability Index</button>
-      <button class="style-btn" data-style="institutionnel">Institutionnel</button>
-    </div>
-
     <!-- 5 Boxes de Métriques -->
     <section class="dashboard-metrics" id="metrics-section">
       <!-- Box 1: Revenus -->
