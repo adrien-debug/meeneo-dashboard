@@ -5,8 +5,16 @@
   "framework": null,
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/dashboard",
       "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
     }
   ],
   "headers": [

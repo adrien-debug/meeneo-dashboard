@@ -2211,7 +2211,14 @@ function handleLogout() {
   if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
     showNotification('Déconnexion en cours...', 'info');
     setTimeout(() => {
-      showNotification('Vous avez été déconnecté', 'success');
+      // Utiliser la fonction logout globale si disponible
+      if (typeof window.logout === 'function') {
+        window.logout();
+      } else {
+        // Fallback : supprimer l'auth et rediriger
+        localStorage.removeItem('meeneo_auth');
+        window.location.href = 'login.html';
+      }
     }, 1000);
   }
 }
@@ -2424,6 +2431,16 @@ document.addEventListener('click', (e) => {
 // INITIALISATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+  // Vérifier l'authentification avant d'initialiser l'application
+  if (typeof window.checkAuthentication === 'function') {
+    if (!window.checkAuthentication()) {
+      console.log('🔐 Authentication check failed, stopping initialization');
+      return;
+    }
+  } else {
+    console.warn('⚠️ checkAuthentication function not found, skipping auth check');
+  }
+  
   console.log('🚀 Initializing application...');
   
   // Vérifier que tous les éléments nécessaires sont présents
