@@ -229,6 +229,11 @@ function getChartConfig(type, data, colors) {
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    resizeDelay: 0,
+    interaction: {
+      intersect: false,
+      mode: 'index'
+    },
     plugins: {
       legend: {
         display: type !== 'doughnut',
@@ -365,8 +370,23 @@ function updateCharts() {
       revenueChart.destroy();
     }
     
-    revenueChart = new Chart(revenueCtx, getChartConfig('line', revenueData, colors));
-    console.log('✅ Revenue chart created/updated');
+    // Attendre que le conteneur soit visible et dimensionné
+    const chartWrapper = revenueCtx.closest('.chart-wrapper');
+    if (chartWrapper && chartWrapper.offsetWidth > 0) {
+      revenueChart = new Chart(revenueCtx, getChartConfig('line', revenueData, colors));
+      console.log('✅ Revenue chart created/updated');
+      
+      // Forcer le redimensionnement après création
+      setTimeout(() => {
+        if (revenueChart) {
+          revenueChart.resize();
+        }
+      }, 100);
+    } else {
+      console.warn('⚠️ Revenue chart wrapper not ready');
+      // Réessayer après un court délai
+      setTimeout(() => updateCharts(), 200);
+    }
   } else {
     console.warn('⚠️ Revenue chart canvas not found');
   }
@@ -380,8 +400,21 @@ function updateCharts() {
       costsChart.destroy();
     }
     
-    costsChart = new Chart(costsCtx, getChartConfig('doughnut', costsData, colors));
-    console.log('✅ Costs chart created/updated');
+    const chartWrapper = costsCtx.closest('.chart-wrapper');
+    if (chartWrapper && chartWrapper.offsetWidth > 0) {
+      costsChart = new Chart(costsCtx, getChartConfig('doughnut', costsData, colors));
+      console.log('✅ Costs chart created/updated');
+      
+      // Forcer le redimensionnement après création
+      setTimeout(() => {
+        if (costsChart) {
+          costsChart.resize();
+        }
+      }, 100);
+    } else {
+      console.warn('⚠️ Costs chart wrapper not ready');
+      setTimeout(() => updateCharts(), 200);
+    }
   } else {
     console.warn('⚠️ Costs chart canvas not found');
   }
@@ -2037,8 +2070,33 @@ function initUserMenu() {
     // Toggle du menu
     userProfile.addEventListener('click', (e) => {
       e.stopPropagation();
-      userProfile.classList.toggle('active');
-      userMenu.classList.toggle('active');
+      const isActive = userProfile.classList.contains('active');
+      
+      // Fermer le menu settings si ouvert
+      closeSettingsMenu();
+      
+      if (isActive) {
+        userProfile.classList.remove('active');
+        userMenu.classList.remove('active');
+      } else {
+        userProfile.classList.add('active');
+        userMenu.classList.add('active');
+        
+        // Sur mobile, positionner le menu en fixed pour éviter les problèmes d'overflow
+        if (window.innerWidth <= 768) {
+          const rect = userProfile.getBoundingClientRect();
+          userMenu.style.position = 'fixed';
+          userMenu.style.top = (rect.bottom + 10) + 'px';
+          userMenu.style.right = '20px';
+          userMenu.style.left = 'auto';
+          userMenu.style.zIndex = '10000';
+        } else {
+          userMenu.style.position = 'absolute';
+          userMenu.style.top = 'calc(100% + 10px)';
+          userMenu.style.right = '0';
+          userMenu.style.left = 'auto';
+        }
+      }
     });
     
     // Fermer les menus en cliquant ailleurs (gestion globale)
@@ -2077,6 +2135,12 @@ function closeUserMenu() {
   if (userProfile && userMenu) {
     userProfile.classList.remove('active');
     userMenu.classList.remove('active');
+    // Réinitialiser les styles inline
+    userMenu.style.position = '';
+    userMenu.style.top = '';
+    userMenu.style.right = '';
+    userMenu.style.left = '';
+    userMenu.style.zIndex = '';
   }
 }
 
@@ -2310,6 +2374,21 @@ function initSettingsMenu() {
       console.log('📂 Opening settings menu');
       settingsBtn.classList.add('active');
       settingsMenu.classList.add('active');
+      
+      // Sur mobile, positionner le menu en fixed pour éviter les problèmes d'overflow
+      if (window.innerWidth <= 768) {
+        const rect = settingsBtn.getBoundingClientRect();
+        settingsMenu.style.position = 'fixed';
+        settingsMenu.style.top = (rect.bottom + 10) + 'px';
+        settingsMenu.style.right = '20px';
+        settingsMenu.style.left = 'auto';
+        settingsMenu.style.zIndex = '10000';
+      } else {
+        settingsMenu.style.position = 'absolute';
+        settingsMenu.style.top = 'calc(100% + 10px)';
+        settingsMenu.style.right = '0';
+        settingsMenu.style.left = 'auto';
+      }
     }
   });
   
@@ -2357,6 +2436,12 @@ function closeSettingsMenu() {
   if (settingsBtn && settingsMenu) {
     settingsBtn.classList.remove('active');
     settingsMenu.classList.remove('active');
+    // Réinitialiser les styles inline
+    settingsMenu.style.position = '';
+    settingsMenu.style.top = '';
+    settingsMenu.style.right = '';
+    settingsMenu.style.left = '';
+    settingsMenu.style.zIndex = '';
   }
 }
 
@@ -2529,6 +2614,32 @@ document.addEventListener('DOMContentLoaded', () => {
   initChartsWhenReady();
   
   initScrollAnimations(); // Initialiser les animations au scroll
+  
+  // Gestion du redimensionnement de la fenêtre pour les graphiques
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      if (revenueChart) {
+        revenueChart.resize();
+      }
+      if (costsChart) {
+        costsChart.resize();
+      }
+    }, 250);
+  });
+  
+  // Gestion de l'orientation sur mobile
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      if (revenueChart) {
+        revenueChart.resize();
+      }
+      if (costsChart) {
+        costsChart.resize();
+      }
+    }, 500);
+  });
   
   // Vérifier que les boutons sont bien connectés
   console.log('🔗 Checking button connections...');
