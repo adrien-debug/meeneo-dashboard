@@ -2,8 +2,25 @@
 // DASHBOARD MEENEO - APPLICATION JAVASCRIPT
 // ============================================
 
-// Configuration GSAP
-gsap.registerPlugin(ScrollTrigger);
+// Configuration GSAP - sera initialisé après le chargement du DOM
+let gsapInitialized = false;
+
+function initGSAP() {
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+    console.warn('⚠️ GSAP or ScrollTrigger not loaded yet');
+    return false;
+  }
+  
+  try {
+    gsap.registerPlugin(ScrollTrigger);
+    gsapInitialized = true;
+    console.log('✅ GSAP initialized successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Error initializing GSAP:', error);
+    return false;
+  }
+}
 
 // ============================================
 // GESTION DES STYLES
@@ -24,6 +41,7 @@ function initStyle() {
 styleButtons.forEach(button => {
   button.addEventListener('click', () => {
     const style = button.dataset.style;
+    console.log(`🔄 Switching to page: ${style}`);
     currentStyle = style;
     
     // Mise à jour des boutons actifs
@@ -34,6 +52,7 @@ styleButtons.forEach(button => {
     
     // Application du style au body
     body.className = `style-${style}`;
+    console.log(`✅ Body class updated to: style-${style}`);
     
     // Mise à jour du contenu selon la page
     updatePageContent(style);
@@ -43,6 +62,8 @@ styleButtons.forEach(button => {
     
     // Réanimation des métriques
     animateMetrics();
+    
+    console.log(`✅ Page switched to ${style} successfully`);
   });
 });
 
@@ -50,46 +71,62 @@ styleButtons.forEach(button => {
 // ANIMATION DES MÉTRIQUES
 // ============================================
 function animateMetrics() {
+  if (!gsapInitialized || typeof gsap === 'undefined') {
+    console.warn('⚠️ GSAP not initialized, skipping metrics animation');
+    return;
+  }
+  
   const metricBoxes = document.querySelectorAll('.metric-box');
   
-  // Reset
-  gsap.set(metricBoxes, { opacity: 0, y: 20 });
+  if (metricBoxes.length === 0) {
+    console.warn('⚠️ No metric boxes found');
+    return;
+  }
   
-  // Animation selon le style
-  gsap.to(metricBoxes, {
-    opacity: 1,
-    y: 0,
-    duration: 0.4,
-    stagger: 0.05,
-    ease: 'power1.out'
-  });
-  
-  // Animation des valeurs (compteur)
-  metricBoxes.forEach(box => {
-    const valueElement = box.querySelector('.metric-value');
-    const valueText = valueElement.textContent;
+  try {
+    // Reset
+    gsap.set(metricBoxes, { opacity: 0, y: 20 });
     
-    // Extraction du nombre
-    const numberMatch = valueText.match(/[\d,]+/);
-    if (numberMatch) {
-      const targetValue = parseFloat(numberMatch[0].replace(/,/g, ''));
-      const suffix = valueText.replace(/[\d,]+/, '').trim();
+    // Animation selon le style
+    gsap.to(metricBoxes, {
+      opacity: 1,
+      y: 0,
+      duration: 0.4,
+      stagger: 0.05,
+      ease: 'power1.out'
+    });
+    
+    // Animation des valeurs (compteur)
+    metricBoxes.forEach(box => {
+      const valueElement = box.querySelector('.metric-value');
+      if (!valueElement) return;
       
-      // Animation du compteur
-      gsap.fromTo(
-        { value: 0 },
-        {
-          value: targetValue,
-          duration: 1.5,
-          ease: 'power2.out',
-          onUpdate: function() {
-            const currentValue = Math.floor(this.targets()[0].value);
-            valueElement.textContent = formatNumber(currentValue) + (suffix ? ' ' + suffix : '');
+      const valueText = valueElement.textContent;
+      
+      // Extraction du nombre
+      const numberMatch = valueText.match(/[\d,]+/);
+      if (numberMatch) {
+        const targetValue = parseFloat(numberMatch[0].replace(/,/g, ''));
+        const suffix = valueText.replace(/[\d,]+/, '').trim();
+        
+        // Animation du compteur
+        gsap.fromTo(
+          { value: 0 },
+          {
+            value: targetValue,
+            duration: 1.5,
+            ease: 'power2.out',
+            onUpdate: function() {
+              const currentValue = Math.floor(this.targets()[0].value);
+              valueElement.textContent = formatNumber(currentValue) + (suffix ? ' ' + suffix : '');
+            }
           }
-        }
-      );
-    }
-  });
+        );
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error animating metrics:', error);
+  }
 }
 
 // Formatage des nombres
@@ -345,20 +382,42 @@ function updateChartsForPeriod(period) {
 // ============================================
 // ANIMATIONS AU SCROLL
 // ============================================
-gsap.utils.toArray('.chart-container').forEach((container, i) => {
-  gsap.from(container, {
-    scrollTrigger: {
-      trigger: container,
-      start: 'top 80%',
-      toggleActions: 'play none none none'
-    },
-    opacity: 0,
-    y: 30,
-    duration: 0.6,
-    delay: i * 0.1,
-    ease: 'power2.out'
-  });
-});
+function initScrollAnimations() {
+  if (!gsapInitialized || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+    console.warn('⚠️ GSAP/ScrollTrigger not initialized, skipping scroll animations');
+    return;
+  }
+  
+  const chartContainers = document.querySelectorAll('.chart-container');
+  
+  if (chartContainers.length === 0) {
+    console.warn('⚠️ No chart containers found for scroll animation');
+    return;
+  }
+  
+  try {
+    gsap.utils.toArray('.chart-container').forEach((container, i) => {
+      if (!container) return;
+      
+      gsap.from(container, {
+        scrollTrigger: {
+          trigger: container,
+          start: 'top 80%',
+          toggleActions: 'play none none none'
+        },
+        opacity: 0,
+        y: 30,
+        duration: 0.6,
+        delay: i * 0.1,
+        ease: 'power2.out'
+      });
+    });
+    
+    console.log(`✅ Scroll animations initialized for ${chartContainers.length} containers`);
+  } catch (error) {
+    console.error('❌ Error initializing scroll animations:', error);
+  }
+}
 
 // ============================================
 // DONNÉES PAR PAGE
@@ -515,7 +574,19 @@ const pageData = {
 // MISE À JOUR DU CONTENU DE LA PAGE
 // ============================================
 function updatePageContent(pageStyle) {
+  console.log(`📄 Updating page content for: ${pageStyle}`);
   const data = pageData[pageStyle] || pageData.premium;
+  
+  if (!data) {
+    console.error(`❌ No data found for page style: ${pageStyle}`);
+    return;
+  }
+  
+  console.log(`✅ Found data for ${pageStyle}:`, {
+    name: data.name,
+    metricsCount: data.metrics?.length || 0,
+    tableRows: data.table?.data?.length || 0
+  });
   
   // Mise à jour des métriques
   updateMetrics(data.metrics);
@@ -525,6 +596,8 @@ function updatePageContent(pageStyle) {
   
   // Mise à jour du tableau
   updateTable(data.table);
+  
+  console.log(`✅ Page content updated for ${pageStyle}`);
 }
 
 // Mise à jour des métriques
@@ -562,43 +635,69 @@ let currentPage = 1;
 const itemsPerPage = 10;
 
 function updateTable(tableData) {
+  console.log('📊 Updating table with data:', {
+    title: tableData.title,
+    headers: tableData.headers.length,
+    filters: tableData.filters.length,
+    rows: tableData.data.length
+  });
+  
   currentTableData = tableData.data;
   currentPage = 1;
   
   // Mise à jour du titre
   const tableTitle = document.getElementById('table-title');
-  tableTitle.textContent = tableData.title;
+  if (tableTitle) {
+    tableTitle.textContent = tableData.title;
+  } else {
+    console.error('❌ Table title element not found');
+  }
   
   // Les boutons d'ajout sont maintenant centralisés dans le menu Settings
   // Plus besoin de boutons individuels dans les tableaux
   
   // Mise à jour des headers
   const headersRow = document.getElementById('table-headers');
-  headersRow.innerHTML = '';
-  tableData.headers.forEach(header => {
+  if (headersRow) {
+    headersRow.innerHTML = '';
+    tableData.headers.forEach(header => {
+      const th = document.createElement('th');
+      th.textContent = header;
+      headersRow.appendChild(th);
+    });
+    
+    // Ajouter colonne Actions pour toutes les pages avec tableaux
     const th = document.createElement('th');
-    th.textContent = header;
+    th.textContent = 'Actions';
     headersRow.appendChild(th);
-  });
-  
-  // Ajouter colonne Actions pour toutes les pages avec tableaux
-  const th = document.createElement('th');
-  th.textContent = 'Actions';
-  headersRow.appendChild(th);
+  } else {
+    console.error('❌ Table headers row not found');
+  }
   
   // Mise à jour des filtres
   const filterSelect = document.getElementById('filter-select');
-  filterSelect.innerHTML = '';
-  tableData.filters.forEach(filter => {
-    const option = document.createElement('option');
-    option.value = filter.toLowerCase();
-    option.textContent = filter;
-    if (filter === 'Tous') option.value = 'all';
-    filterSelect.appendChild(option);
-  });
+  if (filterSelect) {
+    filterSelect.innerHTML = '';
+    tableData.filters.forEach(filter => {
+      const option = document.createElement('option');
+      option.value = filter.toLowerCase();
+      option.textContent = filter;
+      if (filter === 'Tous') option.value = 'all';
+      filterSelect.appendChild(option);
+    });
+  } else {
+    console.error('❌ Filter select element not found');
+  }
+  
+  // Réinitialiser les filtres
+  filteredTableData = null;
+  currentSearchTerm = '';
+  currentFilterValue = 'all';
   
   // Affichage des données
   renderTable();
+  
+  console.log('✅ Table updated successfully');
 }
 
 // Rendu du tableau
@@ -627,6 +726,7 @@ function renderTable(filteredData = null) {
     viewBtn.setAttribute('data-item', row[0]); // Premier élément de la ligne
     viewBtn.addEventListener('click', (e) => {
       const itemName = e.target.getAttribute('data-item');
+      console.log('👁️ View button clicked for:', itemName);
       handleViewItem(currentStyle, itemName, row);
     });
     td.appendChild(viewBtn);
@@ -652,15 +752,69 @@ let filteredTableData = null;
 let currentSearchTerm = '';
 let currentFilterValue = 'all';
 
-document.getElementById('search-input').addEventListener('input', (e) => {
-  currentSearchTerm = e.target.value.toLowerCase();
-  applyFilters();
-});
-
-document.getElementById('filter-select').addEventListener('change', (e) => {
-  currentFilterValue = e.target.value;
-  applyFilters();
-});
+// Fonction pour initialiser les event listeners des filtres et pagination
+function initTableControls() {
+  const searchInput = document.getElementById('search-input');
+  const filterSelect = document.getElementById('filter-select');
+  const resetFiltersBtn = document.getElementById('reset-filters');
+  const prevPageBtn = document.getElementById('prev-page');
+  const nextPageBtn = document.getElementById('next-page');
+  
+  if (!searchInput || !filterSelect || !resetFiltersBtn || !prevPageBtn || !nextPageBtn) {
+    console.warn('⚠️ Some table control elements not found');
+    return;
+  }
+  
+  console.log('✅ Initializing table controls...');
+  
+  // Recherche
+  searchInput.addEventListener('input', (e) => {
+    currentSearchTerm = e.target.value.toLowerCase();
+    console.log('🔍 Search term changed:', currentSearchTerm);
+    applyFilters();
+  });
+  
+  // Filtre par sélection
+  filterSelect.addEventListener('change', (e) => {
+    currentFilterValue = e.target.value;
+    console.log('🔽 Filter changed:', currentFilterValue);
+    applyFilters();
+  });
+  
+  // Réinitialisation des filtres
+  resetFiltersBtn.addEventListener('click', () => {
+    console.log('🔄 Resetting filters');
+    searchInput.value = '';
+    filterSelect.value = 'all';
+    currentSearchTerm = '';
+    currentFilterValue = 'all';
+    filteredTableData = null;
+    currentPage = 1;
+    renderTable();
+  });
+  
+  // Pagination précédente
+  prevPageBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      console.log('⬅️ Previous page');
+      currentPage--;
+      renderTable(filteredTableData);
+    }
+  });
+  
+  // Pagination suivante
+  nextPageBtn.addEventListener('click', () => {
+    const data = filteredTableData || currentTableData;
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+    if (currentPage < totalPages) {
+      console.log('➡️ Next page');
+      currentPage++;
+      renderTable(filteredTableData);
+    }
+  });
+  
+  console.log('✅ Table controls initialized');
+}
 
 function applyFilters() {
   let filtered = [...currentTableData];
@@ -684,34 +838,6 @@ function applyFilters() {
   currentPage = 1;
   renderTable(filtered);
 }
-
-// Réinitialisation des filtres
-document.getElementById('reset-filters').addEventListener('click', () => {
-  document.getElementById('search-input').value = '';
-  document.getElementById('filter-select').value = 'all';
-  currentSearchTerm = '';
-  currentFilterValue = 'all';
-  filteredTableData = null;
-  currentPage = 1;
-  renderTable();
-});
-
-// Pagination
-document.getElementById('prev-page').addEventListener('click', () => {
-  if (currentPage > 1) {
-    currentPage--;
-    renderTable(filteredTableData);
-  }
-});
-
-document.getElementById('next-page').addEventListener('click', () => {
-  const data = filteredTableData || currentTableData;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-  if (currentPage < totalPages) {
-    currentPage++;
-    renderTable(filteredTableData);
-  }
-});
 
 // ============================================
 // GESTION DU BOUTON VIEW - MODAL (Générique)
@@ -1430,6 +1556,7 @@ function handleAddOperation() {
     e.preventDefault();
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0] + ' ' + now.toTimeString().split(' ')[0].substring(0, 5);
+    // Ordre des colonnes : ['ID Opération', 'Type', 'Statut', 'Hashrate', 'Dernière MAJ']
     const newItem = [
       document.getElementById('add-id').value,
       document.getElementById('add-type').value,
@@ -1680,16 +1807,50 @@ function handleAddCustomer() {
 
 // Sauvegarder un nouvel élément (générique)
 function saveNewItem(newItem, pageStyle) {
-  // Ajouter à la liste
-  currentTableData.push(newItem);
+  console.log(`💾 Saving new item to ${pageStyle}:`, newItem);
   
-  // Mettre à jour les données de la page
-  if (pageData[pageStyle] && pageData[pageStyle].table) {
-    pageData[pageStyle].table.data = currentTableData;
+  // S'assurer qu'on est sur la bonne page
+  if (currentStyle !== pageStyle) {
+    console.log(`🔄 Current style (${currentStyle}) != target style (${pageStyle}), switching...`);
+    // Basculer vers la bonne page
+    const targetButton = document.querySelector(`.style-btn[data-style="${pageStyle}"]`);
+    if (targetButton) {
+      targetButton.click();
+    } else {
+      console.error(`❌ Target button not found for style: ${pageStyle}`);
+    }
   }
   
+  // Récupérer les données actuelles de la page
+  const pageDataObj = pageData[pageStyle];
+  if (!pageDataObj || !pageDataObj.table) {
+    console.error(`❌ Page data not found for style: ${pageStyle}`);
+    showNotification('Erreur : Page non trouvée', 'error');
+    closeModal();
+    return;
+  }
+  
+  // Ajouter à la liste des données de la page
+  if (!pageDataObj.table.data) {
+    console.log('📝 Initializing table data array');
+    pageDataObj.table.data = [];
+  }
+  
+  console.log(`📊 Before: ${pageDataObj.table.data.length} items`);
+  pageDataObj.table.data.push(newItem);
+  console.log(`📊 After: ${pageDataObj.table.data.length} items`);
+  
+  // Mettre à jour les données actuelles du tableau
+  currentTableData = pageDataObj.table.data;
+  
+  // Réinitialiser les filtres
+  filteredTableData = null;
+  currentSearchTerm = '';
+  currentFilterValue = 'all';
+  currentPage = 1;
+  
   // Réafficher le tableau
-  renderTable(filteredTableData || null);
+  renderTable();
   
   // Fermer la modal
   closeModal();
@@ -1702,11 +1863,15 @@ function saveNewItem(newItem, pageStyle) {
     'institutionnel': 'Batch',
     'customers': 'Client'
   };
-  showNotification(`${itemNames[pageStyle] || 'Élément'} ajouté avec succès`, 'success');
+  const itemName = itemNames[pageStyle] || 'Élément';
+  console.log(`✅ ${itemName} added successfully`);
+  showNotification(`${itemName} ajouté avec succès`, 'success');
 }
 
 // Sauvegarder le nouveau client (spécifique)
 function saveNewClient() {
+  console.log('💾 Saving new client...');
+  
   const name = document.getElementById('add-name').value.trim();
   const type = document.getElementById('add-type').value;
   const contract = document.getElementById('add-contract').value;
@@ -1715,10 +1880,24 @@ function saveNewClient() {
   const date = document.getElementById('add-date').value;
   const status = document.getElementById('add-status').value;
   
+  console.log('📝 Client data:', { name, type, contract, revenue, hashrate, date, status });
+  
   // Validation
   if (!name || !type || !contract || !revenue || !hashrate || !date || !status) {
+    console.error('❌ Validation failed: missing required fields');
     showNotification('Veuillez remplir tous les champs obligatoires', 'error');
     return;
+  }
+  
+  // S'assurer qu'on est sur la page Customers
+  if (currentStyle !== 'customers') {
+    console.log('🔄 Switching to customers page...');
+    const targetButton = document.querySelector('.style-btn[data-style="customers"]');
+    if (targetButton) {
+      targetButton.click();
+    } else {
+      console.error('❌ Customers button not found');
+    }
   }
   
   // Formater la date
@@ -1726,22 +1905,35 @@ function saveNewClient() {
   
   // Créer le nouveau client
   const newClient = [name, type, contract, revenue, hashrate, formattedDate, status];
-  
-  // Ajouter à la liste
-  currentTableData.push(newClient);
+  console.log('👤 New client created:', newClient);
   
   // Mettre à jour les données de la page
-  if (pageData.customers) {
-    pageData.customers.table.data = currentTableData;
+  if (!pageData.customers.table.data) {
+    console.log('📝 Initializing customers table data array');
+    pageData.customers.table.data = [];
   }
   
+  console.log(`📊 Before: ${pageData.customers.table.data.length} clients`);
+  pageData.customers.table.data.push(newClient);
+  console.log(`📊 After: ${pageData.customers.table.data.length} clients`);
+  
+  // Mettre à jour les données actuelles du tableau
+  currentTableData = pageData.customers.table.data;
+  
+  // Réinitialiser les filtres
+  filteredTableData = null;
+  currentSearchTerm = '';
+  currentFilterValue = 'all';
+  currentPage = 1;
+  
   // Réafficher le tableau
-  renderTable(filteredTableData || null);
+  renderTable();
   
   // Fermer la modal
   closeModal();
   
   // Afficher notification de succès
+  console.log(`✅ Client "${name}" added successfully`);
   showNotification(`Client "${name}" ajouté avec succès`, 'success');
 }
 
@@ -1820,13 +2012,8 @@ function initUserMenu() {
       userMenu.classList.toggle('active');
     });
     
-    // Fermer le menu en cliquant ailleurs
-    document.addEventListener('click', (e) => {
-      if (!userProfile.contains(e.target) && !userMenu.contains(e.target)) {
-        userProfile.classList.remove('active');
-        userMenu.classList.remove('active');
-      }
-    });
+    // Fermer les menus en cliquant ailleurs (gestion globale)
+    // Cette fonction sera appelée pour fermer tous les menus
     
     // Gestionnaires d'événements pour les items du menu
     document.getElementById('view-profile')?.addEventListener('click', (e) => {
@@ -2060,32 +2247,59 @@ function initSettingsMenu() {
   const settingsBtn = document.getElementById('settings-btn');
   const settingsMenu = document.getElementById('settings-menu');
   
-  if (settingsBtn && settingsMenu) {
-    // Toggle du menu au clic sur le bouton
-    settingsBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      settingsBtn.classList.toggle('active');
-      settingsMenu.classList.toggle('active');
-    });
+  if (!settingsBtn || !settingsMenu) {
+    console.error('❌ Settings button or menu not found');
+    console.error('Settings button:', settingsBtn);
+    console.error('Settings menu:', settingsMenu);
+    return;
+  }
+  
+  console.log('✅ Settings button and menu found');
+  
+  // Toggle du menu au clic sur le bouton
+  settingsBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('🔧 Settings button clicked');
+    const isActive = settingsBtn.classList.contains('active');
     
-    // Fermer le menu en cliquant ailleurs
-    document.addEventListener('click', (e) => {
-      if (!settingsBtn.contains(e.target) && !settingsMenu.contains(e.target)) {
-        settingsBtn.classList.remove('active');
-        settingsMenu.classList.remove('active');
+    // Fermer le menu utilisateur si ouvert
+    closeUserMenu();
+    
+    if (isActive) {
+      console.log('📂 Closing settings menu');
+      settingsBtn.classList.remove('active');
+      settingsMenu.classList.remove('active');
+    } else {
+      console.log('📂 Opening settings menu');
+      settingsBtn.classList.add('active');
+      settingsMenu.classList.add('active');
+    }
+  });
+  
+  // Fermer le menu en cliquant ailleurs (géré globalement)
+  // Gestionnaires d'événements pour les actions d'ajout
+  const actionButtons = settingsMenu.querySelectorAll('.settings-action-btn');
+  console.log(`✅ Found ${actionButtons.length} settings action buttons`);
+  
+  actionButtons.forEach((btn, index) => {
+    const action = btn.getAttribute('data-action');
+    console.log(`  - Button ${index + 1}: ${action}`);
+    
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const action = btn.getAttribute('data-action');
+      console.log('🎯 Settings action clicked:', action);
+      if (action) {
+        handleSettingsAction(action);
+      } else {
+        console.warn('⚠️ No action attribute found on button');
       }
     });
-    
-    // Gestionnaires d'événements pour les actions d'ajout
-    const actionButtons = settingsMenu.querySelectorAll('.settings-action-btn');
-    actionButtons.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const action = btn.getAttribute('data-action');
-        handleSettingsAction(action);
-      });
-    });
-  }
+  });
+  
+  console.log('✅ Settings menu initialized successfully');
 }
 
 // Ouvrir le menu Settings
@@ -2112,40 +2326,177 @@ function closeSettingsMenu() {
 
 // Gérer les actions du menu Settings
 function handleSettingsAction(action) {
+  console.log('🎯 handleSettingsAction called with:', action);
   closeSettingsMenu();
   
+  // Mapping des actions vers les styles de page
+  const actionToPageStyle = {
+    'add-activity': 'premium',
+    'add-operation': 'cockpit',
+    'add-analysis': 'dynamic',
+    'add-batch': 'institutionnel',
+    'add-customer': 'customers'
+  };
+  
+  const targetPageStyle = actionToPageStyle[action];
+  console.log(`📄 Target page style: ${targetPageStyle}, Current style: ${currentStyle}`);
+  
+  // Si on n'est pas sur la bonne page, basculer automatiquement
+  if (targetPageStyle && currentStyle !== targetPageStyle) {
+    console.log(`🔄 Switching to page: ${targetPageStyle}`);
+    // Basculer vers la bonne page
+    const targetButton = document.querySelector(`.style-btn[data-style="${targetPageStyle}"]`);
+    if (targetButton) {
+      console.log('✅ Target button found, clicking...');
+      targetButton.click();
+      // Attendre un peu que la page se charge avant d'ouvrir le formulaire
+      setTimeout(() => {
+        console.log('⏱️ Timeout completed, executing action');
+        executeAddAction(action);
+      }, 300);
+    } else {
+      console.warn('⚠️ Target button not found, executing action directly');
+      executeAddAction(action);
+    }
+  } else {
+    console.log('✅ Already on correct page, executing action directly');
+    executeAddAction(action);
+  }
+}
+
+// Exécuter l'action d'ajout
+function executeAddAction(action) {
+  console.log('🚀 executeAddAction called with:', action);
   switch(action) {
     case 'add-activity':
+      console.log('➕ Adding activity...');
       handleAddActivity();
       break;
     case 'add-operation':
+      console.log('⚙️ Adding operation...');
       handleAddOperation();
       break;
     case 'add-analysis':
+      console.log('📊 Adding analysis...');
       handleAddAnalysis();
       break;
     case 'add-batch':
+      console.log('⛏️ Adding batch...');
       handleAddBatch();
       break;
     case 'add-customer':
+      console.log('👤 Adding customer...');
       handleAddCustomer();
       break;
     default:
+      console.error('❌ Unknown action:', action);
       showNotification('Action non reconnue', 'info');
   }
 }
 
 // ============================================
+// GESTION GLOBALE DES CLICS (Fermeture des menus)
+// ============================================
+document.addEventListener('click', (e) => {
+  const userProfile = document.getElementById('user-profile');
+  const userMenu = document.getElementById('user-menu');
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsMenu = document.getElementById('settings-menu');
+  
+  // Fermer le menu utilisateur si on clique ailleurs
+  if (userProfile && userMenu) {
+    if (!userProfile.contains(e.target) && !userMenu.contains(e.target)) {
+      userProfile.classList.remove('active');
+      userMenu.classList.remove('active');
+    }
+  }
+  
+  // Fermer le menu Settings si on clique ailleurs
+  if (settingsBtn && settingsMenu) {
+    if (!settingsBtn.contains(e.target) && !settingsMenu.contains(e.target)) {
+      settingsBtn.classList.remove('active');
+      settingsMenu.classList.remove('active');
+    }
+  }
+});
+
+// ============================================
 // INITIALISATION
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 Initializing application...');
+  
+  // Vérifier que tous les éléments nécessaires sont présents
+  const requiredElements = {
+    'settings-btn': document.getElementById('settings-btn'),
+    'settings-menu': document.getElementById('settings-menu'),
+    'user-profile': document.getElementById('user-profile'),
+    'user-menu': document.getElementById('user-menu'),
+    'style-buttons': document.querySelectorAll('.style-btn'),
+    'table-body': document.getElementById('table-body'),
+    'revenue-chart': document.getElementById('revenue-chart'),
+    'costs-chart': document.getElementById('costs-chart')
+  };
+  
+  console.log('🔍 Checking required elements...');
+  let allElementsFound = true;
+  for (const [name, element] of Object.entries(requiredElements)) {
+    if (element === null || (Array.isArray(element) && element.length === 0)) {
+      console.error(`❌ Missing element: ${name}`);
+      allElementsFound = false;
+    } else {
+      console.log(`✅ Found: ${name}`);
+    }
+  }
+  
+  if (allElementsFound) {
+    console.log('✅ All required elements found');
+  } else {
+    console.warn('⚠️ Some elements are missing, but continuing initialization...');
+  }
+  
+  // Initialisation des composants
+  console.log('📦 Initializing components...');
+  
+  // Initialiser GSAP en premier
+  if (!initGSAP()) {
+    console.warn('⚠️ GSAP initialization failed, some animations may not work');
+  }
+  
   initStyle();
   initUserMenu();
   initSettingsMenu();
+  initTableControls(); // Initialiser les contrôles de tableau
   updateUserDisplay();
   updatePageContent(currentStyle);
   updateCharts();
   animateMetrics();
+  initScrollAnimations(); // Initialiser les animations au scroll
+  
+  // Vérifier que les boutons sont bien connectés
+  console.log('🔗 Checking button connections...');
+  const styleButtons = document.querySelectorAll('.style-btn');
+  console.log(`✅ Found ${styleButtons.length} style buttons`);
+  
+  const settingsActionButtons = document.querySelectorAll('.settings-action-btn');
+  console.log(`✅ Found ${settingsActionButtons.length} settings action buttons`);
+  
+  const viewButtons = document.querySelectorAll('.view-btn');
+  console.log(`✅ Found ${viewButtons.length} view buttons`);
+  
+  const paginationButtons = document.querySelectorAll('.pagination-btn');
+  console.log(`✅ Found ${paginationButtons.length} pagination buttons`);
+  
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  console.log(`✅ Found ${filterButtons.length} filter buttons`);
+  
+  const chartPeriodButtons = document.querySelectorAll('.chart-period');
+  console.log(`✅ Found ${chartPeriodButtons.length} chart period buttons`);
+  
+  console.log('✅ Application initialized successfully');
+  console.log('📊 Current page style:', currentStyle);
+  console.log('👤 Current user:', currentUser.name);
+  console.log('📋 Table data items:', currentTableData.length);
 });
 
 
