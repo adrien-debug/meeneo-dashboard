@@ -194,13 +194,24 @@ function getChartColors() {
 function getRevenueData() {
   const labels = [];
   const data = [];
-  const now = new Date();
   
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
+  // Ligne droite parfaite à 41,000 dollars
+  // Période: du 01/11 au 30/11 (novembre)
+  const horizontalValue = 41000; // Prix fixe à 41k dollars
+  
+  // Créer les dates du 01/11 au 30/11
+  // Année: utiliser l'année actuelle ou 2024 par défaut
+  const currentYear = new Date().getFullYear();
+  const startDate = new Date(currentYear, 10, 1); // Novembre = mois 10 (0-indexed)
+  const endDate = new Date(currentYear, 10, 30);  // 30 novembre
+  
+  // Générer 30 points de données (du 01/11 au 30/11)
+  for (let day = 1; day <= 30; day++) {
+    const date = new Date(currentYear, 10, day); // Novembre = mois 10
     labels.push(date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
-    data.push(Math.random() * 50000 + 100000);
+    
+    // Ligne parfaitement droite à 41,000 dollars (pas d'oscillation)
+    data.push(horizontalValue);
   }
   
   return { labels, data };
@@ -215,7 +226,7 @@ function getCostsData() {
 
 // Configuration commune des graphiques
 function getChartConfig(type, data, colors) {
-  const commonConfig = {
+  const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -275,28 +286,31 @@ function getChartConfig(type, data, colors) {
   };
 
   if (type === 'line') {
+    // Ligne droite parfaite à 41,000 dollars
+    // Du 01/11 au 30/11 - Pas d'oscillation, ligne droite
     return {
-      ...commonConfig,
       type: 'line',
       data: {
         labels: data.labels,
-        datasets: [{
-          label: 'Revenus',
-          data: data.data,
-          borderColor: '#F56A3B',
-          backgroundColor: `rgba(245, 106, 59, 0.1)`,
-          borderWidth: 2,
-          fill: true,
-          tension: 0,
-          pointRadius: 4,
-          pointHoverRadius: 7,
-          pointBackgroundColor: '#F56A3B',
-          pointBorderColor: '#FFFFFF',
-          pointBorderWidth: 2
-        }]
+        datasets: [
+          {
+            label: 'Revenus',
+            data: data.data,
+            borderColor: '#F56A3B', // Orange
+            backgroundColor: `rgba(245, 106, 59, 0.1)`,
+            borderWidth: 2,
+            fill: true,
+            tension: 0, // Ligne parfaitement droite (0% courbure)
+            pointRadius: 4,
+            pointHoverRadius: 7,
+            pointBackgroundColor: '#F56A3B',
+            pointBorderColor: '#FFFFFF',
+            pointBorderWidth: 2
+          }
+        ]
       },
       options: {
-        ...commonConfig,
+        ...commonOptions,
         animation: {
           duration: 1000,
           easing: 'easeOutQuart'
@@ -305,7 +319,6 @@ function getChartConfig(type, data, colors) {
     };
   } else if (type === 'doughnut') {
     return {
-      ...commonConfig,
       type: 'doughnut',
       data: {
         labels: data.labels,
@@ -323,7 +336,7 @@ function getChartConfig(type, data, colors) {
         }]
       },
       options: {
-        ...commonConfig,
+        ...commonOptions,
         animation: {
           animateRotate: true,
           duration: 1000
@@ -335,27 +348,43 @@ function getChartConfig(type, data, colors) {
 
 // Création/Mise à jour des graphiques
 function updateCharts() {
+  // Vérifier que Chart.js est chargé
+  if (typeof Chart === 'undefined') {
+    console.warn('⚠️ Chart.js not loaded yet, skipping chart update');
+    return;
+  }
+  
   const colors = getChartColors();
   
   // Graphique Revenus
   const revenueCtx = document.getElementById('revenue-chart');
-  const revenueData = getRevenueData();
-  
-  if (revenueChart) {
-    revenueChart.destroy();
+  if (revenueCtx) {
+    const revenueData = getRevenueData();
+    
+    if (revenueChart) {
+      revenueChart.destroy();
+    }
+    
+    revenueChart = new Chart(revenueCtx, getChartConfig('line', revenueData, colors));
+    console.log('✅ Revenue chart created/updated');
+  } else {
+    console.warn('⚠️ Revenue chart canvas not found');
   }
-  
-  revenueChart = new Chart(revenueCtx, getChartConfig('line', revenueData, colors));
   
   // Graphique Coûts
   const costsCtx = document.getElementById('costs-chart');
-  const costsData = getCostsData();
-  
-  if (costsChart) {
-    costsChart.destroy();
+  if (costsCtx) {
+    const costsData = getCostsData();
+    
+    if (costsChart) {
+      costsChart.destroy();
+    }
+    
+    costsChart = new Chart(costsCtx, getChartConfig('doughnut', costsData, colors));
+    console.log('✅ Costs chart created/updated');
+  } else {
+    console.warn('⚠️ Costs chart canvas not found');
   }
-  
-  costsChart = new Chart(costsCtx, getChartConfig('doughnut', costsData, colors));
 }
 
 // ============================================
@@ -2486,8 +2515,19 @@ document.addEventListener('DOMContentLoaded', () => {
   initTableControls(); // Initialiser les contrôles de tableau
   updateUserDisplay();
   updatePageContent(currentStyle);
-  updateCharts();
-  animateMetrics();
+  
+  // Attendre que Chart.js soit chargé avant d'initialiser les graphiques
+  function initChartsWhenReady() {
+    if (typeof Chart !== 'undefined') {
+      updateCharts();
+      animateMetrics();
+    } else {
+      // Réessayer après un court délai si Chart.js n'est pas encore chargé
+      setTimeout(initChartsWhenReady, 100);
+    }
+  }
+  initChartsWhenReady();
+  
   initScrollAnimations(); // Initialiser les animations au scroll
   
   // Vérifier que les boutons sont bien connectés

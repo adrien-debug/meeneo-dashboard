@@ -280,6 +280,20 @@ body {
   font-size: 16px;
   width: 20px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-menu-item span svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text);
+  transition: color 0.2s ease;
+}
+
+.user-menu-item:hover span svg {
+  color: var(--color-black);
 }
 
 /* ============================================
@@ -462,9 +476,20 @@ body {
   transition: all 0.3s ease;
 }
 
+.settings-action-icon svg {
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary);
+  transition: all 0.3s ease;
+}
+
 .settings-action-btn:hover .settings-action-icon {
   background: var(--color-primary);
   transform: scale(1.1);
+}
+
+.settings-action-btn:hover .settings-action-icon svg {
+  color: var(--color-white);
 }
 
 .settings-action-content {
