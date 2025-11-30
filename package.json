@@ -1,0 +1,22 @@
+{
+  "name": "meeneo-dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard Meeneo - Interface de visualisation des données",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No build step required'"
+  },
+  "keywords": [
+    "dashboard",
+    "meeneo",
+    "analytics"
+  ],
+  "author": "Meeneo",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
+

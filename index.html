@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Meeneo</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+</head>
+<body>
+  <!-- Header Dashboard -->
+  <header class="dashboard-header">
+    <div class="header-container">
+      <div class="logo">
+        <img src="https://cdn.prod.website-files.com/687f61063dcf7ce10f7c8821/6880dc89d5bcec7bc161af43_meeneo-logo.svg" alt="Meeneo logo">
+      </div>
+      <nav class="header-nav">
+        <ul>
+          <li><a href="#overview">Vue d'ensemble</a></li>
+          <li><a href="#analytics">Analytics</a></li>
+          <li><a href="#settings">Paramètres</a></li>
+        </ul>
+      </nav>
+      <div class="user-info">
+        <span class="user-name">Utilisateur</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dashboard Content -->
+  <main class="dashboard-main">
+    <!-- Style Selector -->
+    <div class="style-selector">
+      <button class="style-btn active" data-style="premium">Premium</button>
+      <button class="style-btn" data-style="dynamic">Dynamic</button>
+      <button class="style-btn" data-style="institutionnel">Institutionnel</button>
+    </div>
+
+    <!-- 5 Boxes de Métriques -->
+    <section class="dashboard-metrics" id="metrics-section">
+      <!-- Box 1: Revenus -->
+      <div class="metric-box" data-metric="revenue">
+        <div class="metric-icon"></div>
+        <div class="metric-label">REVENUS</div>
+        <div class="metric-value">€125,430</div>
+        <div class="metric-change positive">
+          <span class="change-icon">↑</span>
+          <span class="change-value">12.5%</span>
+          <span class="change-text">vs mois dernier</span>
+        </div>
+      </div>
+
+      <!-- Box 2: Hashrate -->
+      <div class="metric-box" data-metric="hashrate">
+        <div class="metric-icon"></div>
+        <div class="metric-label">HASHRATE</div>
+        <div class="metric-value">2.45 TH/s</div>
+        <div class="metric-change positive">
+          <span class="change-icon">↑</span>
+          <span class="change-value">8.3%</span>
+          <span class="change-text">vs mois dernier</span>
+        </div>
+      </div>
+
+      <!-- Box 3: Actifs miniers -->
+      <div class="metric-box" data-metric="miners">
+        <div class="metric-icon"></div>
+        <div class="metric-label">ACTIFS MINIERS</div>
+        <div class="metric-value">1,247</div>
+        <div class="metric-change positive">
+          <span class="change-icon">↑</span>
+          <span class="change-value">5.2%</span>
+          <span class="change-text">vs mois dernier</span>
+        </div>
+      </div>
+
+      <!-- Box 4: Efficacité énergétique -->
+      <div class="metric-box" data-metric="efficiency">
+        <div class="metric-icon"></div>
+        <div class="metric-label">EFFICACITÉ</div>
+        <div class="metric-value">94.2%</div>
+        <div class="metric-change negative">
+          <span class="change-icon">↓</span>
+          <span class="change-value">2.1%</span>
+          <span class="change-text">vs mois dernier</span>
+        </div>
+      </div>
+
+      <!-- Box 5: Coût opérationnel -->
+      <div class="metric-box" data-metric="cost">
+        <div class="metric-icon"></div>
+        <div class="metric-label">COÛT OPÉRATIONNEL</div>
+        <div class="metric-value">€45,230</div>
+        <div class="metric-change negative">
+          <span class="change-icon">↓</span>
+          <span class="change-value">3.7%</span>
+          <span class="change-text">vs mois dernier</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Zone de contenu principal - Graphiques -->
+    <section class="dashboard-charts">
+      <!-- Graphique 1: Évolution des revenus -->
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3 class="chart-title">Évolution des Revenus</h3>
+          <div class="chart-controls">
+            <button class="chart-period active" data-period="7d">7j</button>
+            <button class="chart-period" data-period="30d">30j</button>
+            <button class="chart-period" data-period="90d">90j</button>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="revenue-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Graphique 2: Performance Hashrate -->
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3 class="chart-title">Performance Hashrate</h3>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="hashrate-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Graphique 3: Répartition des coûts -->
+      <div class="chart-container chart-full-width">
+        <div class="chart-header">
+          <h3 class="chart-title">Répartition des Coûts</h3>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="costs-chart"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="dashboard-footer">
+    <div class="footer-container">
+      <p>&copy; 2025 Meeneo. All rights reserved.</p>
+      <nav class="footer-nav">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="/cookies">Cookies Settings</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

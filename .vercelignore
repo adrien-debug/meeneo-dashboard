@@ -1,0 +1,8 @@
+node_modules
+.git
+.DS_Store
+*.log
+.env
+server.js
+start.sh
+
