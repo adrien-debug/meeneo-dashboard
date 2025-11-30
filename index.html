@@ -28,7 +28,7 @@
 
   <!-- Main Dashboard Content -->
   <main class="dashboard-main">
-    <!-- 5 Boxes de Métriques -->
+    <!-- 4 Boxes de Métriques -->
     <section class="dashboard-metrics" id="metrics-section">
       <!-- Box 1: Revenus -->
       <div class="metric-box" data-metric="revenue">
@@ -77,26 +77,14 @@
           <span class="change-text">vs mois dernier</span>
         </div>
       </div>
-
-      <!-- Box 5: Coût opérationnel -->
-      <div class="metric-box" data-metric="cost">
-        <div class="metric-icon"></div>
-        <div class="metric-label">COÛT OPÉRATIONNEL</div>
-        <div class="metric-value">€45,230</div>
-        <div class="metric-change negative">
-          <span class="change-icon">↓</span>
-          <span class="change-value">3.7%</span>
-          <span class="change-text">vs mois dernier</span>
-        </div>
-      </div>
     </section>
 
     <!-- Zone de contenu principal - Graphiques -->
-    <section class="dashboard-charts">
+    <section class="dashboard-charts" id="charts-section">
       <!-- Graphique 1: Évolution des revenus -->
       <div class="chart-container">
         <div class="chart-header">
-          <h3 class="chart-title">Évolution des Revenus</h3>
+          <h3 class="chart-title" id="chart-title-1">Évolution des Revenus</h3>
           <div class="chart-controls">
             <button class="chart-period active" data-period="7d">7j</button>
             <button class="chart-period" data-period="30d">30j</button>
@@ -108,23 +96,46 @@
         </div>
       </div>
 
-      <!-- Graphique 2: Performance Hashrate -->
+      <!-- Graphique 2: Répartition des coûts -->
       <div class="chart-container">
         <div class="chart-header">
-          <h3 class="chart-title">Performance Hashrate</h3>
-        </div>
-        <div class="chart-wrapper">
-          <canvas id="hashrate-chart"></canvas>
-        </div>
-      </div>
-
-      <!-- Graphique 3: Répartition des coûts -->
-      <div class="chart-container chart-full-width">
-        <div class="chart-header">
-          <h3 class="chart-title">Répartition des Coûts</h3>
+          <h3 class="chart-title" id="chart-title-3">Répartition des Coûts</h3>
         </div>
         <div class="chart-wrapper">
           <canvas id="costs-chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Tableaux avec Filtres -->
+    <section class="dashboard-tables" id="tables-section">
+      <div class="table-container">
+        <div class="table-header">
+          <h3 class="table-title" id="table-title">Liste des Données</h3>
+          <div class="table-filters">
+            <input type="text" id="search-input" class="filter-input" placeholder="Rechercher...">
+            <select id="filter-select" class="filter-select">
+              <option value="all">Tous</option>
+            </select>
+            <button class="filter-btn" id="reset-filters">Réinitialiser</button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table" id="data-table">
+            <thead>
+              <tr id="table-headers">
+                <!-- Headers seront générés dynamiquement -->
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <!-- Données seront générées dynamiquement -->
+            </tbody>
+          </table>
+        </div>
+        <div class="table-pagination">
+          <button class="pagination-btn" id="prev-page" disabled>Précédent</button>
+          <span class="pagination-info" id="pagination-info">Page 1 sur 1</span>
+          <button class="pagination-btn" id="next-page">Suivant</button>
         </div>
       </div>
     </section>
